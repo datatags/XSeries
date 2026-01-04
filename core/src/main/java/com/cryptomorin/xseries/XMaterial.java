@@ -2560,14 +2560,14 @@ public enum XMaterial implements XBase<XMaterial, Material> {
             // Null-checked for unit tests that don't run a server.
             // noinspection ConstantValue
             if (Bukkit.getServer() == null) {
-                System.err.println("Bukkit.getServer() in null. This should not happen when running a plugin normally");
+                System.err.println("Bukkit.getServer() is null. This should not happen when running a plugin normally.");
                 VERSION = 21;
             } else {
                 String version = Bukkit.getVersion();
                 Matcher matcher = Pattern.compile("MC: \\d\\.(\\d+)").matcher(version);
 
                 if (matcher.find()) VERSION = Integer.parseInt(matcher.group(1));
-                else throw new IllegalArgumentException("Failed to parse server version from: " + version);
+                else throw new IllegalArgumentException("Failed to parse server version: " + version);
             }
         }
 
