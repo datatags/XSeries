@@ -21,9 +21,10 @@
  */
 package com.cryptomorin.xseries;
 
-import com.cryptomorin.xseries.base.XBase;
+import com.cryptomorin.xseries.base.XModule;
 import com.cryptomorin.xseries.base.annotations.XInfo;
 import org.bukkit.*;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -39,11 +40,13 @@ import java.util.*;
  * of this class instead of interacting with {@link GameRule} object directly or the methods
  * provided in {@link World} as they've been changed.
  *
- * @param <T> The type of the value that this gamerule requires.
+ * @see GameRule
+ * @param <T> The type of the value that this game rule requires.
+ *            Usually only {@link Integer} or {@link Boolean} (rarely {@link String})
  * @author Almighty-Satan
  */
 @SuppressWarnings("JavaLangInvokeHandleSignature")
-public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
+public final class XGameRule<T> extends XModule<XGameRule<T>, String> {
 
     private static final boolean SUPPORTS_GameRule;
     private static final MethodHandle GameRule_getByName;
@@ -81,407 +84,424 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
      * Whether command blocks should notify admins when they perform commands.
      * Controls if command block executions are broadcast to ops in chat.
      */
-    public static final XGameRule<Boolean> COMMAND_BLOCK_OUTPUT = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "command_block_output", "commandBlockOutput");
+    public static final XGameRule<Boolean> COMMAND_BLOCK_OUTPUT = std(Boolean.class, /* v1.21.11+ */ "command_block_output", "commandBlockOutput");
 
     /**
      * Whether the daylight cycle and moon phases progress.
      * Controls if time advances with day/night cycle.
      */
-    public static final XGameRule<Boolean> ADVANCE_TIME = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "advance_time", "doDaylightCycle");
+    public static final XGameRule<Boolean> ADVANCE_TIME = std(Boolean.class, /* v1.21.11+ */ "advance_time", "doDaylightCycle");
 
     /**
      * Whether non-mob entities (like boats, minecarts, items from item frames) drop items when broken.
      */
-    public static final XGameRule<Boolean> ENTITY_DROPS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "entity_drops", "doEntityDrops");
+    public static final XGameRule<Boolean> ENTITY_DROPS = std(Boolean.class, /* v1.21.11+ */ "entity_drops", "doEntityDrops");
 
     /**
      * Whether mobs drop their loot (items and experience) when killed.
      */
-    public static final XGameRule<Boolean> MOB_DROPS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "mob_drops", "doMobLoot");
+    public static final XGameRule<Boolean> MOB_DROPS = std(Boolean.class, /* v1.21.11+ */ "mob_drops", "doMobLoot");
 
     /**
      * Whether mobs spawn naturally.
      * Does not affect spawners or structure spawns.
      */
-    public static final XGameRule<Boolean> SPAWN_MOBS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_mobs", "doMobSpawning");
+    public static final XGameRule<Boolean> SPAWN_MOBS = std(Boolean.class, /* v1.21.11+ */ "spawn_mobs", "doMobSpawning");
 
     /**
      * Whether blocks drop items when broken (not by explosions or creative mode).
      */
-    public static final XGameRule<Boolean> BLOCK_DROPS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "block_drops", "doTileDrops");
+    public static final XGameRule<Boolean> BLOCK_DROPS = std(Boolean.class, /* v1.21.11+ */ "block_drops", "doTileDrops");
 
     /**
      * Whether players keep their inventory and experience after death.
      */
-    public static final XGameRule<Boolean> KEEP_INVENTORY = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "keep_inventory", "keepInventory");
+    public static final XGameRule<Boolean> KEEP_INVENTORY = std(Boolean.class, /* v1.21.11+ */ "keep_inventory", "keepInventory");
 
     /**
      * Whether admin commands (like /give, /tp) are logged to the server log.
      */
-    public static final XGameRule<Boolean> LOG_ADMIN_COMMANDS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "log_admin_commands", "logAdminCommands");
+    public static final XGameRule<Boolean> LOG_ADMIN_COMMANDS = std(Boolean.class, /* v1.21.11+ */ "log_admin_commands", "logAdminCommands");
 
     /**
      * Whether mobs can grief the world (e.g., creepers explode blocks, endermen pick up blocks).
      */
-    public static final XGameRule<Boolean> MOB_GRIEFING = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "mob_griefing", "mobGriefing");
+    public static final XGameRule<Boolean> MOB_GRIEFING = std(Boolean.class, /* v1.21.11+ */ "mob_griefing", "mobGriefing");
 
     /**
      * Whether players naturally regenerate health when hunger is full.
      */
-    public static final XGameRule<Boolean> NATURAL_HEALTH_REGENERATION = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "natural_health_regeneration", "naturalRegeneration");
+    public static final XGameRule<Boolean> NATURAL_HEALTH_REGENERATION = std(Boolean.class, /* v1.21.11+ */ "natural_health_regeneration", "naturalRegeneration");
 
     /**
      * Whether reduced debug screen info is shown (hides coordinates, etc.).
      */
-    public static final XGameRule<Boolean> REDUCED_DEBUG_INFO = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "reduced_debug_info", "reducedDebugInfo");
+    public static final XGameRule<Boolean> REDUCED_DEBUG_INFO = std(Boolean.class, /* v1.21.11+ */ "reduced_debug_info", "reducedDebugInfo");
 
     /**
      * Whether command feedback (success/failure messages) is sent to the player.
      */
-    public static final XGameRule<Boolean> SEND_COMMAND_FEEDBACK = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "send_command_feedback", "sendCommandFeedback");
+    public static final XGameRule<Boolean> SEND_COMMAND_FEEDBACK = std(Boolean.class, /* v1.21.11+ */ "send_command_feedback", "sendCommandFeedback");
 
     /**
      * Whether death messages are shown in chat.
      */
-    public static final XGameRule<Boolean> SHOW_DEATH_MESSAGES = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "show_death_messages", "showDeathMessages");
+    public static final XGameRule<Boolean> SHOW_DEATH_MESSAGES = std(Boolean.class, /* v1.21.11+ */ "show_death_messages", "showDeathMessages");
 
     /**
      * Controls the rate of random block ticks (crop growth, leaf decay, etc.).
-     * Default is 3; higher values make processes faster.
+     * Default is {@code 3}; higher values make processes faster.
      */
-    public static final XGameRule<Integer> RANDOM_TICK_SPEED = new XGameRule<>(Integer.class, /* v1.21.11+ */ "random_tick_speed", "randomTickSpeed");
+    public static final XGameRule<Integer> RANDOM_TICK_SPEED = std(Integer.class, /* v1.21.11+ */ "random_tick_speed", "randomTickSpeed");
 
     /**
      * Whether spectators generate new chunks when moving around.
      */
     @XInfo(since = "1.9")
-    public static final XGameRule<Boolean> SPECTATORS_GENERATE_CHUNKS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spectators_generate_chunks", "spectatorsGenerateChunks");
+    public static final XGameRule<Boolean> SPECTATORS_GENERATE_CHUNKS = std(Boolean.class, /* v1.21.11+ */ "spectators_generate_chunks", "spectatorsGenerateChunks");
 
     /**
      * Whether the server checks for elytra flight cheating (speed/movement validation).
-     * Set to false to disable the check.
+     * Set to {@code false} to disable the check.
      */
     @XInfo(since = "1.9")
-    public static final XGameRule<Boolean> ELYTRA_MOVEMENT_CHECK = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "elytra_movement_check", "disableElytraMovementCheck");
+    public static final XGameRule<Boolean> ELYTRA_MOVEMENT_CHECK = std(Boolean.class, /* v1.21.11+ */ "elytra_movement_check", "disableElytraMovementCheck");
 
     /**
      * The radius around world spawn where players respawn if no bed.
      */
     @XInfo(since = "1.9")
-    public static final XGameRule<Integer> RESPAWN_RADIUS = new XGameRule<>(Integer.class, /* v1.21.11+ */ "respawn_radius", "spawnRadius");
+    public static final XGameRule<Integer> RESPAWN_RADIUS = std(Integer.class, /* v1.21.11+ */ "respawn_radius", "spawnRadius");
 
     /**
      * Whether weather cycles (rain, thunder) progress naturally.
      */
     @XInfo(since = "1.11")
-    public static final XGameRule<Boolean> ADVANCE_WEATHER = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "advance_weather", "doWeatherCycle");
+    public static final XGameRule<Boolean> ADVANCE_WEATHER = std(Boolean.class, /* v1.21.11+ */ "advance_weather", "doWeatherCycle");
 
     /**
      * Maximum number of entities that can be crammed in one block before taking suffocation damage.
      */
     @XInfo(since = "1.11")
-    public static final XGameRule<Integer> MAX_ENTITY_CRAMMING = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_entity_cramming", "maxEntityCramming");
+    public static final XGameRule<Integer> MAX_ENTITY_CRAMMING = std(Integer.class, /* v1.21.11+ */ "max_entity_cramming", "maxEntityCramming");
 
     /**
      * Whether crafting recipes require the exact arrangement as discovered in the recipe book.
      */
     @XInfo(since = "1.12")
-    public static final XGameRule<Boolean> LIMITED_CRAFTING = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "limited_crafting", "doLimitedCrafting");
+    public static final XGameRule<Boolean> LIMITED_CRAFTING = std(Boolean.class, /* v1.21.11+ */ "limited_crafting", "doLimitedCrafting");
 
     /**
      * Whether advancement completion messages are announced in chat.
      */
     @XInfo(since = "1.12")
-    public static final XGameRule<Boolean> SHOW_ADVANCEMENT_MESSAGES = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "show_advancement_messages", "announceAdvancements");
+    public static final XGameRule<Boolean> SHOW_ADVANCEMENT_MESSAGES = std(Boolean.class, /* v1.21.11+ */ "show_advancement_messages", "announceAdvancements");
 
     /**
      * Maximum length of a command chain (function or command block chain).
      */
     @XInfo(since = "1.12")
-    public static final XGameRule<Integer> MAX_COMMAND_SEQUENCE_LENGTH = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_command_sequence_length", "maxCommandChainLength");
+    public static final XGameRule<Integer> MAX_COMMAND_SEQUENCE_LENGTH = std(Integer.class, /* v1.21.11+ */ "max_command_sequence_length", "maxCommandChainLength");
 
     /**
      * The function that runs every game tick.
      */
     @XInfo(since = "1.12", removedSince = "1.13")
-    public static final XGameRule<String> GAME_LOOP_FUNCTION = new XGameRule<>(String.class, "gameLoopFunction");
+    @Deprecated
+    public static final XGameRule<String> GAME_LOOP_FUNCTION = std(String.class, "gameLoopFunction");
 
     /**
      * Whether raids can occur (inverted: true disables raids).
      */
     @XInfo(since = "1.14.3")
-    public static final XGameRule<Boolean> RAIDS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "raids", "disableRaids");
+    public static final XGameRule<Boolean> RAIDS = std(Boolean.class, /* v1.21.11+ */ "raids", "disableRaids");
 
     /**
      * Whether phantoms spawn from insomnia.
      */
     @XInfo(since = "1.15")
-    public static final XGameRule<Boolean> SPAWN_PHANTOMS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_phantoms", "doInsomnia");
+    public static final XGameRule<Boolean> SPAWN_PHANTOMS = std(Boolean.class, /* v1.21.11+ */ "spawn_phantoms", "doInsomnia");
 
     /**
      * Whether players respawn immediately without the death screen.
      */
     @XInfo(since = "1.15")
-    public static final XGameRule<Boolean> IMMEDIATE_RESPAWN = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "immediate_respawn", "doImmediateRespawn");
+    public static final XGameRule<Boolean> IMMEDIATE_RESPAWN = std(Boolean.class, /* v1.21.11+ */ "immediate_respawn", "doImmediateRespawn");
 
     /**
      * Whether players take drowning damage.
      */
     @XInfo(since = "1.15")
-    public static final XGameRule<Boolean> DROWNING_DAMAGE = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "drowning_damage", "drowningDamage");
+    public static final XGameRule<Boolean> DROWNING_DAMAGE = std(Boolean.class, /* v1.21.11+ */ "drowning_damage", "drowningDamage");
 
     /**
      * Whether players take fall damage.
      */
     @XInfo(since = "1.15")
-    public static final XGameRule<Boolean> FALL_DAMAGE = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "fall_damage", "fallDamage");
+    public static final XGameRule<Boolean> FALL_DAMAGE = std(Boolean.class, /* v1.21.11+ */ "fall_damage", "fallDamage");
 
     /**
      * Whether players take fire/lava damage.
      */
     @XInfo(since = "1.15")
-    public static final XGameRule<Boolean> FIRE_DAMAGE = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "fire_damage", "fireDamage");
+    public static final XGameRule<Boolean> FIRE_DAMAGE = std(Boolean.class, /* v1.21.11+ */ "fire_damage", "fireDamage");
 
     /**
      * Whether pillager patrols spawn naturally.
      */
     @XInfo(since = "1.15.2")
-    public static final XGameRule<Boolean> SPAWN_PATROLS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_patrols", "doPatrolSpawning");
+    public static final XGameRule<Boolean> SPAWN_PATROLS = std(Boolean.class, /* v1.21.11+ */ "spawn_patrols", "doPatrolSpawning");
 
     /**
      * Whether wandering traders spawn naturally.
      */
     @XInfo(since = "1.15.2")
-    public static final XGameRule<Boolean> SPAWN_WANDERING_TRADERS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_wandering_traders", "doTraderSpawning");
+    public static final XGameRule<Boolean> SPAWN_WANDERING_TRADERS = std(Boolean.class, /* v1.21.11+ */ "spawn_wandering_traders", "doTraderSpawning");
 
     /**
      * Whether angered neutral mobs forgive players who die and respawn.
      */
     @XInfo(since = "1.16.1")
-    public static final XGameRule<Boolean> FORGIVE_DEAD_PLAYERS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "forgive_dead_players", "forgiveDeadPlayers");
+    public static final XGameRule<Boolean> FORGIVE_DEAD_PLAYERS = std(Boolean.class, /* v1.21.11+ */ "forgive_dead_players", "forgiveDeadPlayers");
 
     /**
      * Whether angered neutral mobs attack any nearby player (universal anger).
      */
     @XInfo(since = "1.16.1")
-    public static final XGameRule<Boolean> UNIVERSAL_ANGER = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "universal_anger", "universalAnger");
+    public static final XGameRule<Boolean> UNIVERSAL_ANGER = std(Boolean.class, /* v1.21.11+ */ "universal_anger", "universalAnger");
 
     /**
      * Whether players take freeze damage in powder snow.
      */
     @XInfo(since = "1.17")
-    public static final XGameRule<Boolean> FREEZE_DAMAGE = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "freeze_damage", "freezeDamage");
+    public static final XGameRule<Boolean> FREEZE_DAMAGE = std(Boolean.class, /* v1.21.11+ */ "freeze_damage", "freezeDamage");
 
     /**
      * Percentage of players that must sleep to skip the night.
      */
     @XInfo(since = "1.17")
-    public static final XGameRule<Integer> PLAYERS_SLEEPING_PERCENTAGE = new XGameRule<>(Integer.class, /* v1.21.11+ */ "players_sleeping_percentage", "playersSleepingPercentage");
+    public static final XGameRule<Integer> PLAYERS_SLEEPING_PERCENTAGE = std(Integer.class, /* v1.21.11+ */ "players_sleeping_percentage", "playersSleepingPercentage");
 
     /**
      * Whether wardens spawn naturally in ancient cities.
      */
     @XInfo(since = "1.19")
-    public static final XGameRule<Boolean> SPAWN_WARDENS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_wardens", "doWardenSpawning");
+    public static final XGameRule<Boolean> SPAWN_WARDENS = std(Boolean.class, /* v1.21.11+ */ "spawn_wardens", "doWardenSpawning");
 
     /**
      * Whether block explosion drops have decay (chance to not drop based on distance).
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> BLOCK_EXPLOSION_DROP_DECAY = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "block_explosion_drop_decay", "blockExplosionDropDecay");
+    public static final XGameRule<Boolean> BLOCK_EXPLOSION_DROP_DECAY = std(Boolean.class, /* v1.21.11+ */ "block_explosion_drop_decay", "blockExplosionDropDecay");
 
     /**
      * Whether mob (creeper/ghast) explosion drops have decay.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> MOB_EXPLOSION_DROP_DECAY = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "mob_explosion_drop_decay", "mobExplosionDropDecay");
+    public static final XGameRule<Boolean> MOB_EXPLOSION_DROP_DECAY = std(Boolean.class, /* v1.21.11+ */ "mob_explosion_drop_decay", "mobExplosionDropDecay");
 
     /**
      * Whether TNT explosion drops have decay.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> TNT_EXPLOSION_DROP_DECAY = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "tnt_explosion_drop_decay", "tntExplosionDropDecay");
+    public static final XGameRule<Boolean> TNT_EXPLOSION_DROP_DECAY = std(Boolean.class, /* v1.21.11+ */ "tnt_explosion_drop_decay", "tntExplosionDropDecay");
 
     /**
      * Whether water source blocks convert to flowing water under certain conditions.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> WATER_SOURCE_CONVERSION = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "water_source_conversion", "waterSourceConversion");
+    public static final XGameRule<Boolean> WATER_SOURCE_CONVERSION = std(Boolean.class, /* v1.21.11+ */ "water_source_conversion", "waterSourceConversion");
 
     /**
      * Whether lava source blocks convert to flowing lava under certain conditions.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> LAVA_SOURCE_CONVERSION = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "lava_source_conversion", "lavaSourceConversion");
+    public static final XGameRule<Boolean> LAVA_SOURCE_CONVERSION = std(Boolean.class, /* v1.21.11+ */ "lava_source_conversion", "lavaSourceConversion");
 
     /**
      * Whether certain sound events are heard globally by all players.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Boolean> GLOBAL_SOUND_EVENTS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "global_sound_events", "globalSoundEvents");
+    public static final XGameRule<Boolean> GLOBAL_SOUND_EVENTS = std(Boolean.class, /* v1.21.11+ */ "global_sound_events", "globalSoundEvents");
 
     /**
      * Maximum height snow can accumulate in a single block.
      */
     @XInfo(since = "1.19.3")
-    public static final XGameRule<Integer> MAX_SNOW_ACCUMULATION_HEIGHT = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_snow_accumulation_height", "snowAccumulationHeight");
+    public static final XGameRule<Integer> MAX_SNOW_ACCUMULATION_HEIGHT = std(Integer.class, /* v1.21.11+ */ "max_snow_accumulation_height", "snowAccumulationHeight");
 
     /**
      * Whether vines spread to adjacent blocks.
      */
     @XInfo(since = "1.19.4")
-    public static final XGameRule<Boolean> SPREAD_VINES = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spread_vines", "doVinesSpread");
+    public static final XGameRule<Boolean> SPREAD_VINES = std(Boolean.class, /* v1.21.11+ */ "spread_vines", "doVinesSpread");
 
     /**
      * Maximum number of block modifications allowed in a single command (anti-grief).
      */
     @XInfo(since = "1.19.4")
-    public static final XGameRule<Integer> MAX_BLOCK_MODIFICATIONS = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_block_modifications", "commandModificationBlockLimit");
+    public static final XGameRule<Integer> MAX_BLOCK_MODIFICATIONS = std(Integer.class, /* v1.21.11+ */ "max_block_modifications", "commandModificationBlockLimit");
 
     /**
      * Whether ender pearls disappear when the player dies.
      */
     @XInfo(since = "1.20.2")
-    public static final XGameRule<Boolean> ENDER_PEARLS_VANISH_ON_DEATH = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "ender_pearls_vanish_on_death", "enderPearlsVanishOnDeath");
+    public static final XGameRule<Boolean> ENDER_PEARLS_VANISH_ON_DEATH = std(Boolean.class, /* v1.21.11+ */ "ender_pearls_vanish_on_death", "enderPearlsVanishOnDeath");
 
     /**
      * Whether projectiles (arrows, tridents, etc.) can break certain blocks.
      */
     @XInfo(since = "1.20.3")
-    public static final XGameRule<Boolean> PROJECTILES_CAN_BREAK_BLOCKS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "projectiles_can_break_blocks", "projectilesCanBreakBlocks");
+    public static final XGameRule<Boolean> PROJECTILES_CAN_BREAK_BLOCKS = std(Boolean.class, /* v1.21.11+ */ "projectiles_can_break_blocks", "projectilesCanBreakBlocks");
 
     /**
      * Maximum number of command forks allowed.
      */
     @XInfo(since = "1.20.3")
-    public static final XGameRule<Integer> MAX_COMMAND_FORKS = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_command_forks", "maxCommandForkCount");
+    public static final XGameRule<Integer> MAX_COMMAND_FORKS = std(Integer.class, /* v1.21.11+ */ "max_command_forks", "maxCommandForkCount");
 
     /**
      * Default delay (in ticks) for players entering Nether portals in survival/adventure.
      */
     @XInfo(since = "1.20.3")
-    public static final XGameRule<Integer> PLAYERS_NETHER_PORTAL_DEFAULT_DELAY = new XGameRule<>(Integer.class, /* v1.21.11+ */ "players_nether_portal_default_delay", "playersNetherPortalDefaultDelay");
+    public static final XGameRule<Integer> PLAYERS_NETHER_PORTAL_DEFAULT_DELAY = std(Integer.class, /* v1.21.11+ */ "players_nether_portal_default_delay", "playersNetherPortalDefaultDelay");
 
     /**
      * Delay (in ticks) for players in creative mode entering Nether portals.
      */
     @XInfo(since = "1.20.3")
-    public static final XGameRule<Integer> PLAYERS_NETHER_PORTAL_CREATIVE_DELAY = new XGameRule<>(Integer.class, /* v1.21.11+ */ "players_nether_portal_creative_delay", "playersNetherPortalCreativeDelay");
+    public static final XGameRule<Integer> PLAYERS_NETHER_PORTAL_CREATIVE_DELAY = std(Integer.class, /* v1.21.11+ */ "players_nether_portal_creative_delay", "playersNetherPortalCreativeDelay");
 
     /**
      * Radius of spawn chunks that are always loaded.
      */
     @XInfo(since = "1.20.5", removedSince = "1.21.9")
-    public static final XGameRule<Integer> SPAWN_CHUNK_RADIUS = new XGameRule<>(Integer.class, "spawnChunkRadius");
+    @Deprecated
+    public static final XGameRule<Integer> SPAWN_CHUNK_RADIUS = std(Integer.class, "spawnChunkRadius");
 
     /**
      * Whether the server performs player movement validation checks.
      */
     @XInfo(since = "1.21.2")
-    public static final XGameRule<Boolean> PLAYER_MOVEMENT_CHECK = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "player_movement_check", "disablePlayerMovementCheck");
+    public static final XGameRule<Boolean> PLAYER_MOVEMENT_CHECK = std(Boolean.class, /* v1.21.11+ */ "player_movement_check", "disablePlayerMovementCheck");
 
     /**
      * Maximum speed of minecarts.
      */
     @XInfo(since = "1.21.2")
-    public static final XGameRule<Integer> MAX_MINECART_SPEED = new XGameRule<>(Integer.class, /* v1.21.11+ */ "max_minecart_speed", "minecartMaxSpeed");
+    public static final XGameRule<Integer> MAX_MINECART_SPEED = std(Integer.class, /* v1.21.11+ */ "max_minecart_speed", "minecartMaxSpeed");
 
     /**
      * Whether primed TNT explodes.
      */
     @XInfo(since = "1.21.5")
-    public static final XGameRule<Boolean> TNT_EXPLODES = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "tnt_explodes", "tntExplodes");
+    public static final XGameRule<Boolean> TNT_EXPLODES = std(Boolean.class, /* v1.21.11+ */ "tnt_explodes", "tntExplodes");
 
     /**
      * Whether fire continues to tick/update when far from players.
      */
     @XInfo(since = "1.21.5", removedSince = "1.21.11")
-    public static final XGameRule<Boolean> ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER = new XGameRule<>(Boolean.class, "allowFireTicksAwayFromPlayer");
+    @Deprecated
+    public static final XGameRule<Boolean> ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER = std(Boolean.class, "allowFireTicksAwayFromPlayer");
 
     /**
      * Whether the locator bar (on maps?) is shown.
      */
     @XInfo(since = "1.21.6")
-    public static final XGameRule<Boolean> LOCATOR_BAR = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "locator_bar", "locatorBar");
+    public static final XGameRule<Boolean> LOCATOR_BAR = std(Boolean.class, /* v1.21.11+ */ "locator_bar", "locatorBar");
 
     /**
      * Whether PvP (player vs player damage) is enabled.
      */
     @XInfo(since = "1.21.9")
-    public static final XGameRule<Boolean> PVP = new XGameRule<>(Boolean.class, "pvp");
+    public static final XGameRule<Boolean> PVP = std(Boolean.class, "pvp");
 
     /**
      * Whether players can enter the Nether using portals.
      */
     @XInfo(since = "1.21.9")
-    public static final XGameRule<Boolean> ALLOW_ENTERING_NETHER_USING_PORTALS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "allow_entering_nether_using_portals", "allowEnteringNetherUsingPortals");
+    public static final XGameRule<Boolean> ALLOW_ENTERING_NETHER_USING_PORTALS = std(Boolean.class, /* v1.21.11+ */ "allow_entering_nether_using_portals", "allowEnteringNetherUsingPortals");
 
     /**
      * Whether hostile monsters spawn naturally.
      */
     @XInfo(since = "1.21.9")
-    public static final XGameRule<Boolean> SPAWN_MONSTERS = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawn_monsters", "spawnMonsters");
+    public static final XGameRule<Boolean> SPAWN_MONSTERS = std(Boolean.class, /* v1.21.11+ */ "spawn_monsters", "spawnMonsters");
 
     /**
      * Whether command blocks are enabled and can execute commands.
      */
     @XInfo(since = "1.21.9")
-    public static final XGameRule<Boolean> COMMAND_BLOCKS_WORK = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "command_blocks_work", "commandBlocksEnabled");
+    public static final XGameRule<Boolean> COMMAND_BLOCKS_WORK = std(Boolean.class, /* v1.21.11+ */ "command_blocks_work", "commandBlocksEnabled");
 
     /**
      * Whether monster spawners work and spawn mobs.
      */
     @XInfo(since = "1.21.9")
-    public static final XGameRule<Boolean> SPAWNER_BLOCKS_WORK = new XGameRule<>(Boolean.class, /* v1.21.11+ */ "spawner_blocks_work", "spawnerBlocksEnabled");
+    public static final XGameRule<Boolean> SPAWNER_BLOCKS_WORK = std(Boolean.class, /* v1.21.11+ */ "spawner_blocks_work", "spawnerBlocksEnabled");
 
     /**
      * Radius around players where fire spreads faster or is allowed.
      */
     @XInfo(since = "1.21.11")
-    public static final XGameRule<Integer> FIRE_SPREAD_RADIUS_AROUND_PLAYER = new XGameRule<>(Integer.class, "fire_spread_radius_around_player");
+    public static final XGameRule<Integer> FIRE_SPREAD_RADIUS_AROUND_PLAYER = std(Integer.class, "fire_spread_radius_around_player");
 
     /**
      * Legacy rule: Whether fire spreads and burns blocks.
-     * Removed in 1.21.11 (replaced by newer fire rules).
+     * Removed and replaced in 1.21.11 by newer fire rules.
      *
      * @see #FIRE_SPREAD_RADIUS_AROUND_PLAYER
      * @see #ALLOW_FIRE_TICKS_AWAY_FROM_PLAYER
      */
-    @XInfo(since = ".", removedSince = "1.21.11")
-    public static final XGameRule<Boolean> DO_FIRE_TICK = new XGameRule<>(Boolean.class, "doFireTick");
+    @XInfo(since = "", removedSince = "1.21.11")
+    @Deprecated
+    public static final XGameRule<Boolean> DO_FIRE_TICK = std(Boolean.class, "doFireTick");
 
-    private final String[] names;
-    private final Class<?> type;
-    @Nullable private final String usableName;
+    @NotNull private final Class<?> type;
     @Nullable private final Object gamerule;
 
-    @SuppressWarnings("deprecation")
-    private XGameRule(@NotNull Class<T> type, @NotNull String... names) {
-        this.names = names;
+    private XGameRule(@NotNull Class<T> type, String usableName, Object bukkitObject, @NotNull String... names) {
+        super(usableName, names);
         this.type = type;
+        this.gamerule = bukkitObject;
+
+        if (usableName != null) Data.NAME_MAPPING.put(usableName.toLowerCase(Locale.ENGLISH), this);
+        if (bukkitObject != null) Data.OBJECT_MAPPING.put((GameRule<?>) bukkitObject, this);
+        Arrays.stream(names).forEach(x -> Data.NAME_MAPPING.put(x.toLowerCase(Locale.ENGLISH), this));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static <T> XGameRule<T> std(@NotNull Class<T> type, @NotNull String... names) {
+        if (names == null || names.length == 0)
+            throw new IllegalArgumentException("No name provided for rule with type: " + type);
+
+        Objects.requireNonNull(type, () -> "Type of " + names[0] + " is null");
+
+        Object bukkitObject;
+        String usableName;
 
         if (Data.SUPPORTS_Registry_GAME_RULE) {
             GameRule<?> gameRule = Arrays.stream(names)
                     .map(Data::getGameRule)
                     .filter(Objects::nonNull)
                     .findAny().orElse(null);
-            this.gamerule = gameRule;
+            bukkitObject = gameRule;
 
             if (gameRule != null) {
                 NamespacedKey key = gameRule.getKeyOrNull();
                 if (key == null)
-                    throw new IllegalStateException("Game rule " + gameRule + " of " + this + " has no key");
-                this.usableName = key.getKey();
+                    throw new IllegalStateException("Game rule " + gameRule + " of " + names[0] + " has no key");
+                usableName = key.getKey();
             } else {
-                this.usableName = null;
+                usableName = null;
             }
 
             if (gameRule != null && type != gameRule.getType()) {
                 new IllegalStateException("Game rule type mismatch: "
-                        + this + " (" + type + ") != "
+                        + names[0] + " (" + type + ") != "
                         + gameRule + " (" + gameRule.getType() + ')').printStackTrace();
             }
-        } else if (SUPPORTS_GameRule) {
+        } else if (GameRule_getByName != null) {
             GameRule<?> gameRule = Arrays.stream(names)
                     .map(x -> {
                         try {
@@ -492,17 +512,15 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
                     })
                     .filter(Objects::nonNull)
                     .findAny().orElse(null);
-            this.gamerule = gameRule;
-            this.usableName = gameRule.getName();
+            bukkitObject = gameRule;
+            usableName = gameRule.getName();
         } else {
             World world = Bukkit.getWorlds().get(0);
-            this.usableName = Arrays.stream(names).filter(world::isGameRule).findAny().orElse(null);
-            this.gamerule = null;
+            usableName = Arrays.stream(names).filter(world::isGameRule).findAny().orElse(null);
+            bukkitObject = null;
         }
 
-        if (usableName != null) Data.NAME_MAPPING.put(usableName.toLowerCase(Locale.ENGLISH), this);
-        if (gamerule != null) Data.OBJECT_MAPPING.put((GameRule<?>) gamerule, this);
-        Arrays.stream(names).forEach(x -> Data.NAME_MAPPING.put(x.toLowerCase(Locale.ENGLISH), this));
+        return new XGameRule<>(type, usableName, bukkitObject, names);
     }
 
     private static final class Data {
@@ -514,18 +532,9 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
             boolean supported = true;
 
             try {
-                NamespacedKey.class.getName();
-                Registry.class.getName();
-            } catch (NoClassDefFoundError ex) {
+                Class.forName("org.bukkit.Registry").getDeclaredField("GAME_RULE");
+            } catch (ClassNotFoundException | NoSuchFieldException ex) {
                 supported = false;
-            }
-
-            if (supported) {
-                try {
-                    Registry.class.getDeclaredField("GAME_RULE");
-                } catch (NoSuchFieldException ex) {
-                    supported = false;
-                }
             }
 
             SUPPORTS_Registry_GAME_RULE = supported;
@@ -544,23 +553,8 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
     }
 
     @Override
-    public @NotNull String name() {
-        return this.names[0];
-    }
-
-    @Override
-    public String[] getNames() {
-        return this.names;
-    }
-
-    @Override
-    public @Nullable String get() {
-        return this.usableName;
-    }
-
-    @Override
     public boolean isSupported() {
-        return XBase.super.isSupported() && (!SUPPORTS_GameRule || this.gamerule != null);
+        return super.isSupported() && (!SUPPORTS_GameRule || this.gamerule != null);
     }
 
     /**
@@ -580,11 +574,12 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
      * @throws UnsupportedOperationException if {@link #isSupported()} is {@code false}
      */
     @SuppressWarnings("unchecked")
+    @Contract(pure = true)
     public @Nullable T getValue(@NotNull World world) {
         Objects.requireNonNull(world, "World is null");
 
         if (!isSupported())
-            throw new UnsupportedOperationException("Game rule not supported on this version!");
+            throw new UnsupportedOperationException("Game rule " + this.name() + " not supported on this version!");
 
         if (SUPPORTS_GameRule) {
             GameRule<T> rule = (GameRule<T>) this.gamerule;
@@ -592,7 +587,7 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
         } else {
             String value;
             try {
-                value = (String) World_getGameRuleValue.invokeExact(world, this.usableName);
+                value = (String) World_getGameRuleValue.invokeExact(world, this.get());
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -601,8 +596,10 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
                 return (T) (Object) Boolean.parseBoolean(value);
             else if (this.type == Integer.class)
                 return (T) (Object) Integer.parseInt(value);
-            else
+            else if (this.type == String.class)
                 return (T) value;
+            else
+                throw new IllegalStateException("Unhandled type for " + this + " with value '" + value + '\'');
         }
     }
 
@@ -611,49 +608,57 @@ public final class XGameRule<T> implements XBase<XGameRule<T>, String> {
      *
      * @param world The world in which this game rule should be updated
      * @param value The new value
-     * @return {@code true} if successful
-     * @throws UnsupportedOperationException if {@link #isSupported()} is {@code false}
-     * @throws IllegalArgumentException if {@code value} parameter is not an instance of {@link #getType()}
+     * @throws UnsupportedOperationException If {@link #isSupported()} is {@code false}
+     * @throws IllegalArgumentException If {@code value} parameter is not an instance of {@link #getType()}
      */
-    public boolean setValue(@NotNull World world, @NotNull T value) {
+    @Contract(mutates = "param1")
+    public void setValue(@NotNull World world, @NotNull T value) {
         Objects.requireNonNull(world, "World is null");
         Objects.requireNonNull(world, "Value is null");
 
         if (!isSupported())
-            throw new UnsupportedOperationException("Game rule not supported on this version!");
+            throw new UnsupportedOperationException("Game rule " + this.name() + " not supported on this version!");
 
         if (!this.type.isInstance(value))
             throw new IllegalArgumentException("Invalid type for GameRule " + name() + ": " + value + " (" + value.getClass() + ") expected " + type.getName());
 
+        boolean returnVal;
         if (SUPPORTS_GameRule) {
             @SuppressWarnings("unchecked")
             GameRule<T> rule = (GameRule<T>) this.gamerule;
-            return world.setGameRule(rule, value);
+            returnVal = world.setGameRule(rule, value);
         } else {
             try {
-                return (boolean) World_setGameRuleValue.invokeExact(world, this.usableName, value.toString());
+                returnVal = (boolean) World_setGameRuleValue.invokeExact(world, this.get(), value.toString());
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
         }
+
+        if (!returnVal) {
+            // This is a hardcoded true return value in newer versions.
+            // Even in older versions it only returned false when the rule was null or invalid.
+            throw new AssertionError(this + " returned false for world '"
+                    + world.getName() + "' with value '" + value + '\'');
+        }
     }
 
-    @Override
-    public String toString() {
-        return "XGameRule(" + this.usableName + ')';
-    }
-
+    @NotNull
+    @Contract(pure = true)
     @SuppressWarnings("unchecked")
     public static <T> XGameRule<T> of(@NotNull GameRule<T> bukkit) {
         return (XGameRule<T>) Data.OBJECT_MAPPING.get(bukkit);
     }
 
+    @NotNull
+    @Contract(pure = true)
     public static Optional<XGameRule<?>> of(@NotNull String bukkit) {
         return Optional.ofNullable(Data.NAME_MAPPING.get(bukkit.toLowerCase(Locale.ENGLISH)));
     }
 
     @NotNull
     @Unmodifiable
+    @Contract(pure = true)
     public static Collection<XGameRule<?>> getValues() {
         return Collections.unmodifiableCollection(Data.OBJECT_MAPPING.values());
     }
