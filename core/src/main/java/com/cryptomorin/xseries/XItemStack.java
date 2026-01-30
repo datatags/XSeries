@@ -53,14 +53,16 @@ import org.bukkit.inventory.meta.trim.TrimPattern;
 import org.bukkit.map.MapView;
 import org.bukkit.material.MaterialData;
 import org.bukkit.material.SpawnEgg;
-import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.*;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,9 +82,16 @@ import static com.cryptomorin.xseries.XMaterial.supports;
  *     XItemStack.serializer().fromItem(item).toConfig(section).serialize();
  * }</pre>
  * <p>
+ * <h2>Why Use XItemStack Instead Of Bukkit's API?</h2>
  * What's the point of this class when {@link org.bukkit.configuration.MemorySection#getItemStack(String)} exists?
  * That method works based on YAML tags which makes the config hideous and doesn't have syntax sugars for certain
  * configurations to make the config cleaner and concise. Also, certain values will have unreadable formats.
+ * <p>
+ * <h2>NBT Support</h2>
+ * This class inherently doesn't support NBT. Whether it's for serialization or deserialization.
+ * That's because this class is designed for configuration files and direct NBT access is usually
+ * not required for a configurable item. If you want full proper item support (for example to store
+ * an {@link ItemStack} in a database) you should use Minecraft's Vanilla JSON serialization by using NMS instead.
  *
  * @author Crypto Morin
  * @version 9.0.0
@@ -107,7 +116,7 @@ public final class XItemStack {
             SUPPORTS_CUSTOM_MODEL_DATA,
             SUPPORTS_ADVANCED_CUSTOM_MODEL_DATA,
             SUPPORTS_ITEM_MODEL,
-	        SUPPORTS_ITEM_NAME;
+            SUPPORTS_ITEM_NAME;
 
     static {
         boolean supportsPotionColor = false,
@@ -116,7 +125,7 @@ public final class XItemStack {
                 supportSCustomModelData = false,
                 supportsAdvancedCustomModelData = false,
                 supportsItemModel = false,
-			    supportsItemName = false;
+                supportsItemName = false;
 
 
         try {
@@ -143,11 +152,11 @@ public final class XItemStack {
         } catch (NoSuchMethodException ignored) {
         }
 
-		try {
-			ItemMeta.class.getDeclaredMethod("setItemName", String.class);
-			supportsItemName = true;
-		} catch (NoSuchMethodException ignored) {
-		}
+        try {
+            ItemMeta.class.getDeclaredMethod("setItemName", String.class);
+            supportsItemName = true;
+        } catch (NoSuchMethodException ignored) {
+        }
 
         try {
             Class.forName("org.bukkit.inventory.meta.PotionMeta").getMethod("setColor", Color.class);
@@ -167,7 +176,7 @@ public final class XItemStack {
         SUPPORTS_CUSTOM_MODEL_DATA = supportSCustomModelData;
         SUPPORTS_ADVANCED_CUSTOM_MODEL_DATA = supportsAdvancedCustomModelData;
         SUPPORTS_ITEM_MODEL = supportsItemModel;
-		SUPPORTS_ITEM_NAME = supportsItemName;
+        SUPPORTS_ITEM_NAME = supportsItemName;
     }
 
     private interface MetaHandler<M extends ItemMeta> {
@@ -583,10 +592,10 @@ public final class XItemStack {
                 }
             }
 
-			if (SUPPORTS_ITEM_NAME && meta.hasItemName()) {
-				String itemName = meta.getItemName();
-				config.set("item-name", translator.apply(itemName));
-			}
+            if (SUPPORTS_ITEM_NAME && meta.hasItemName()) {
+                String itemName = meta.getItemName();
+                config.set("item-name", translator.apply(itemName));
+            }
 
             customModelData();
             if (SUPPORTS_UNBREAKABLE) {
@@ -805,11 +814,11 @@ public final class XItemStack {
             if (supports(9)) {
                 if (SUPPORTS_PotionMeta_getBasePotionType) {
                     PotionType basePotionType = meta.getBasePotionType();
-					if (basePotionType != null)
+                    if (basePotionType != null)
                         config.set("base-type", basePotionType.name());
                 } else {
                     @SuppressWarnings("removal")
-                    PotionData potionData = meta.getBasePotionData();
+                    org.bukkit.potion.PotionData potionData = meta.getBasePotionData();
                     // noinspection removal
                     config.set("base-effect", potionData.getType().name() + ", " + potionData.isExtended() + ", " + potionData.isUpgraded());
                 }
@@ -825,9 +834,9 @@ public final class XItemStack {
                             typeStr = x.getType().getName();
                         }
 
-						// we change this to match what the deserializer expects
-						int seconds = x.getDuration() / 20;
-						int level = x.getAmplifier() + 1;
+                        // we change this to match what the deserializer expects
+                        int seconds = x.getDuration() / 20;
+                        int level = x.getAmplifier() + 1;
                         return typeStr + ", " + seconds + ", " + level;
                     }).collect(Collectors.toList()));
                 }
@@ -1044,7 +1053,7 @@ public final class XItemStack {
             getOrCreateMeta();
             handleDurability();
             displayName();
-			itemName();
+            itemName();
             unbreakable();
             customModelData();
             lore();
@@ -1218,19 +1227,19 @@ public final class XItemStack {
             }
         }
 
-		@SuppressWarnings("ConstantValue")
+        @SuppressWarnings("ConstantValue")
         private void itemName() {
-			if (!SUPPORTS_ITEM_NAME)
-				return;
+            if (!SUPPORTS_ITEM_NAME)
+                return;
 
-			String itemName = config.getString("item-name");
-			if (!Strings.isNullOrEmpty(itemName)) {
-				String translated = translator.apply(itemName);
-				meta.setItemName(translated);
-			} else if (itemName != null && itemName.isEmpty()) {
-				meta.setItemName(" ");
-			}
-		}
+            String itemName = config.getString("item-name");
+            if (!Strings.isNullOrEmpty(itemName)) {
+                String translated = translator.apply(itemName);
+                meta.setItemName(translated);
+            } else if (itemName != null && itemName.isEmpty()) {
+                meta.setItemName(" ");
+            }
+        }
 
         private void itemFlags() {
             List<String> flags = config.getStringList("flags");
@@ -1622,7 +1631,7 @@ public final class XItemStack {
                         }
 
                         // noinspection removal,deprecation
-                        potion.setBasePotionData(new PotionData(effect, extended, upgraded));
+                        potion.setBasePotionData(new org.bukkit.potion.PotionData(effect, extended, upgraded));
                     }
                 }
 

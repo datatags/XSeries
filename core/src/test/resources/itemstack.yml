@@ -39,3 +39,7 @@ advanced-custom-model-data-compound:
     flags: [ true, false, true ]
     float: [ 3, 5.3, 1000.3 ]
   material: PAPER
+
+with-item-name:
+  material: PAPER
+  item-name: coolsword

@@ -22,6 +22,7 @@
 package com.cryptomorin.xseries.particles;
 
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -30,9 +31,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.awt.Color;
 import java.util.*;
 import java.util.List;
@@ -65,7 +68,7 @@ import java.util.stream.Collectors;
  * <code>[r, g, b, size]</code>
  *
  * @author Crypto Morin, cricri211, datatags
- * @version 12.0.0
+ * @version 12.0.1
  * @see Particles
  */
 @SuppressWarnings("CallToSimpleGetterFromWithinClass")
@@ -1025,7 +1028,7 @@ public class ParticleDisplay {
     @NotNull
     @Deprecated
     public ParticleDisplay withColor(float red, float green, float blue, float size) {
-        return withColor(new Color((int)red, (int)green, (int)blue), size);
+        return withColor(new Color((int) red, (int) green, (int) blue), size);
     }
 
     /**
@@ -1097,11 +1100,21 @@ public class ParticleDisplay {
         return this;
     }
 
+    @SuppressWarnings("deprecation")
+    @ApiStatus.Experimental
+    public ParticleDisplay withBlock(Block block) {
+        if (particle.getDataType() == ParticleDisplay.ParticleMaterialData.class) {
+            return withBlock(new MaterialData(block.getType(), block.getData()));
+        } else if (particle.getDataType() == ParticleDisplay.ParticleBlockData.class) {
+            return withBlock(block.getBlockData());
+        } else {
+            throw new UnsupportedOperationException("Particle '" + particle + "' doesn't support blocks: " + particle.getDataType());
+        }
+    }
+
     /**
-     * Adds extra data for {@code ITEM_CRACK}
-     * particle, depending on the given item stack.
+     * Specify the required data by {@link XParticle#ITEM}.
      *
-     * @param item the item stack that will change the particle data.
      * @return the same particle display, but modified.
      * @since 5.1.0
      */

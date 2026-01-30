@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * <b>XParticle</b> - Particle enum for <b>XSeries</b>
@@ -52,7 +53,10 @@ public enum XParticle implements XBase<XParticle, Particle> {
      * BLOCK_CRACK, BLOCK_DUST -> BLOCK (v1.20.5)
      */
     @XMerge(version = "1.20.5", name = "BLOCK_DUST")
-    BLOCK("BLOCK_CRACK"),
+    BLOCK(
+            (name -> name.equalsIgnoreCase("BLOCK_CRACK") ? ParticleDisplay.ParticleMaterialData.class : ParticleDisplay.ParticleBlockData.class),
+            "BLOCK_CRACK"
+    ),
 
     @XInfo(since = "1.21.4")
     BLOCK_CRUMBLE,
@@ -184,7 +188,7 @@ public enum XParticle implements XBase<XParticle, Particle> {
     @XChange(version = "v1.20.5", from = "SPELL_INSTANT", to = "INSTANT_EFFECT")
     INSTANT_EFFECT("SPELL_INSTANT"),
     @XChange(version = "v1.20.5", from = "ITEM_CRACK", to = "ITEM")
-    ITEM("ITEM_CRACK"),
+    ITEM(ParticleDisplay.ParticleItemData.class, "ITEM_CRACK"),
 
     ITEM_COBWEB,
 
@@ -270,7 +274,7 @@ public enum XParticle implements XBase<XParticle, Particle> {
     TRIAL_SPAWNER_DETECTION_OMINOUS,
 
     /**
-     * Since the beginning, this was marked as a duplicate of {@link #UNDERWATER}:
+     * Since the beginning, this was marked as a duplicate of {@code UNDERWATER}:
      * https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/browse/src/main/java/org/bukkit/Particle.java?until=5010ed00d3f83b7c7acbf4c1b16f7c89f309eb9a&untilPath=src%2Fmain%2Fjava%2Forg%2Fbukkit%2FParticle.java#17-18
      * <p>
      * however, {@code SUSPENDED_DEPTH} specifically, was marked with "boolean register"
@@ -302,13 +306,17 @@ public enum XParticle implements XBase<XParticle, Particle> {
     private final Particle particle;
     private final Class<? extends ParticleDisplay.ParticleData> dataType;
 
-    XParticle(@Nullable Class<? extends ParticleDisplay.ParticleData> dataType, @NotNull String... names) {
+    XParticle(@Nullable Function<String, Class<? extends ParticleDisplay.ParticleData>> dataType, @NotNull String... names) {
         this.particle = Data.REGISTRY.stdEnum(this, names);
-        this.dataType = dataType;
+        this.dataType = dataType == null ? null : dataType.apply(particle.name());
+    }
+
+    XParticle(@Nullable Class<? extends ParticleDisplay.ParticleData> dataType, @NotNull String... names) {
+        this(dataType == null ? null : (x -> dataType), names);
     }
 
     XParticle(String... names) {
-        this(null, names);
+        this((Function<String, Class<? extends ParticleDisplay.ParticleData>>) null, names);
     }
 
     static {

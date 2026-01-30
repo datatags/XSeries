@@ -524,6 +524,9 @@ public final class XSeriesTests {
 
                 meta.setCustomModelDataComponent(comp);
             }));
+            items.put("with-item-name", createItem(XMaterial.PAPER, meta -> {
+                meta.setItemName("coolsword");
+            }));
         }
         if (metaExists("ColorableArmorMeta")) {
             items.put("leather-colored-armor-trim", createItem(XMaterial.LEATHER_CHESTPLATE, meta -> {
