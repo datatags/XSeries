@@ -641,7 +641,7 @@ public final class XBlock {
         SkullType skullType = getSkullType(material);
         if (!ISFLAT && (parsedName.equals("SKULL_ITEM") || skullType != null)) parsedMat = Material.valueOf("SKULL");
 
-        if (ISFLAT && parsedMat.isBlock()) {
+        if (ISFLAT && !parsedMat.isBlock()) {
             throw new BlockTypeChangeException(BlockTypeChangeException.Reason.NOT_A_BLOCK, material, parsedMat);
         }
         block.setType(parsedMat, applyPhysics);
@@ -791,8 +791,7 @@ public final class XBlock {
             update = true;
         }
 
-        if (update) state.update(true, applyPhysics);
-        if (!update) {
+        if (update && !state.update(true, applyPhysics)) {
             throw new BlockTypeChangeException(BlockTypeChangeException.Reason.STATE_CHANGE_FAILURE, material,
                     ", Failed to change state of: '" + state + '\'');
         }
