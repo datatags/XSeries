@@ -288,13 +288,13 @@ public final class XReflection {
 
         Matcher bukkitVer = Pattern
                 // <patch> is optional for first releases like "1.8-R0.1-SNAPSHOT"
-                .compile("^(?<major>\\d+)\\.(?<minor>\\d+)(?:\\.(?<patch>\\d+))?")
+                .compile("^(?:1\\.)?(?<minor>\\d+)(?:\\.(?<patch>\\d+))?")
                 .matcher(verProp != null ? verProp : Bukkit.getBukkitVersion());
         if (bukkitVer.find()) { // matches() won't work, we just want to match the start using "^"
             try {
                 // group(0) gives the whole matched string, we just want the captured group.
                 String patch = bukkitVer.group("patch");
-                MAJOR_NUMBER = Integer.parseInt(bukkitVer.group("major"));
+                MAJOR_NUMBER = 1; // yeah this makes it 1.26.1 but oh well
                 MINOR_NUMBER = Integer.parseInt(bukkitVer.group("minor"));
                 PATCH_NUMBER = Integer.parseInt((patch == null || patch.isEmpty()) ? "0" : patch);
             } catch (Throwable ex) {
